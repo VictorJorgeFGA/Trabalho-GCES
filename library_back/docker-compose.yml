@@ -1,0 +1,19 @@
+version: "3.1"
+
+services:
+  db:
+    container_name: app_database
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: library_db
+      POSTGRES_PASSWORD: admin
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
