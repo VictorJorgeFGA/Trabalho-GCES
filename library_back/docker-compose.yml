@@ -1,8 +1,8 @@
 version: "3.1"
 
 services:
-  db:
-    container_name: app_database
+  library_db:
+    container_name: library_db
     image: postgres:latest
     restart: always
     ports:
@@ -13,6 +13,29 @@ services:
       POSTGRES_PASSWORD: admin
     networks:
       - app_network
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  library_back:
+    container_name: library_back
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - library_db
+    networks:
+      - app_network
+    environment:
+      POSTGRES_DB: library_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST: library_db
+      POSTGRES_PORT: 5432
 
 networks:
   app_network:
