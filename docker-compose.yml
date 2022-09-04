@@ -1,0 +1,49 @@
+services:
+  library_back:
+    container_name: library_back
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./library_back:/code
+    ports:
+      - 8000:8000
+    build:
+      context: .
+      dockerfile: library_back/Dockerfile
+    depends_on:
+      - library_db
+    networks:
+      - app_network
+
+  library_db:
+    container_name: library_db
+    build:
+      context: ./library_back
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: library_db
+      POSTGRES_PASSWORD: admin
+    networks:
+      - app_network
+    volumes:
+      - ./library_back/data/db:/var/lib/postgresql/data
+
+  library_front:
+    container_name: library_front
+    build:
+      context: ./library_front
+    volumes:
+      - ./library_front:/app/my-app
+      - /app/my-app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+
+networks:
+  app_network:
+    driver: bridge
