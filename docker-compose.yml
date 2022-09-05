@@ -43,6 +43,23 @@ services:
     environment:
       - NODE_ENV=development
     stdin_open: true
+    networks:
+      - app_network
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 3050:80
+    restart: always
+    depends_on:
+      - library_back
+      - library_front
+      - library_db
+    networks:
+      - app_network
 
 networks:
   app_network:
